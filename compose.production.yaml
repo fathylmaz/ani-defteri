@@ -1,0 +1,22 @@
+services:
+  backend:
+    environment:
+      DEBUG: "false"
+      REQUIRE_EMAIL_VERIFICATION: "true"
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN for production}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - journal_caddy:/data
+      - journal_caddy_config:/config
+volumes:
+  journal_caddy:
+  journal_caddy_config:

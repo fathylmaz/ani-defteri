@@ -1,0 +1,42 @@
+name: ani-defteri
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ani_defteri
+      POSTGRES_USER: ani_defteri
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run the setup script or create .env}
+    volumes:
+      - journal_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U ani_defteri -d ani_defteri"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: ani_defteri
+      POSTGRES_USER: ani_defteri
+    healthcheck:
+      test: ["CMD","python","-c","import os,urllib.request; url=os.environ.get('APP_URL','http://localhost:3000'); from urllib.parse import urlsplit; r=urllib.request.Request('http://127.0.0.1:8000/api/health',headers={'Host':urlsplit(url).netloc,'X-Forwarded-Proto':urlsplit(url).scheme}); urllib.request.urlopen(r,timeout=4)"]
+      interval: 10s
+      timeout: 6s
+      retries: 20
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:8080"
+volumes:
+  journal_db:

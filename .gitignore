@@ -1,0 +1,34 @@
+.env
+.env.local
+.venv/
+__pycache__/
+*.pyc
+*.sqlite3*
+node_modules/
+dist/
+backups/
+*.dump
+
+# Yerel ortam ayarları
+.env.*
+!.env.example
+
+# Python ve test önbellekleri
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Yerel araç dosyaları
+.idea/
+.vscode/
+*.log
+Thumbs.db
+.DS_Store
+
+# Yerel sertifikalar ve anahtarlar
+*.pem
+*.key
+/docs/screenshots/pasta.png
